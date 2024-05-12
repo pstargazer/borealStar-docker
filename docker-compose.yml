@@ -1,0 +1,76 @@
+# version: '3.9'
+version: "3.3"
+
+
+volumes:
+  pgdata:
+    driver: local
+  backend_storage:
+    driver: local 
+
+
+
+services:
+
+  database:
+    # image: postgres:latest
+    build: 
+      context: _docker/postgres_dev/
+      dockerfile: dockerfile
+    container_name: "bs_db"
+    restart: unless-stopped
+    env_file: .env.postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready --quiet"]
+      interval: 40s
+      timeout: 40s
+      retries: 5
+    
+    expose:
+      - 5432
+
+
+  adminer:
+    container_name: "bs_adminer"
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      database:
+        condition: service_healthy
+    expose:
+      - 443
+
+
+  backend:
+    container_name: "bs_backend"
+    build: 
+      context: .
+      dockerfile: _docker/backend/Dockerfile
+
+    expose:
+      - 8000
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - ./_docker/backend/conf.d/:/etc/:rw
+      - backend_storage:/var/www/html/master/storage/:rw
+      - ./backend/:/var/www/html
+      - ./_docker/backend/php.ini:/usr/local/etc/php/php.ini-development:ro
+
+
+  frontend:
+    container_name: "bs_frontend"
+    volumes:
+      - ./frontend/:/var/www/html
+    build: 
+      context: .
+      dockerfile: _docker/frontend/Dockerfile
+
+    ports:
+    - 81:5173
+

@@ -1,0 +1,61 @@
+version: '3.9'
+
+
+
+services:
+  postgres:
+    container_name: "bs_db"
+    
+    build: 
+      context: "_docker/postgres"     
+      dockerfile: Dockerfile
+    expose:
+      - 5432
+    environment:
+      - PGVERSION=16
+      - PGCLUSTERNAME=main
+      - PGDATA=/var/lib/postgresql/$PGVERSION/$PGCLUSTERNAME
+      - PGCONF=/etc/postgresql/$PGVERSION/$PGCLUSTERNAME
+      - PG_LOG=/var/log/postgres.log
+      - POSTGRES_USER=docker 
+      - POSTGRES_PASSWORD=docker5820?
+      - POSTGRES_DB=borealstar
+
+    volumes:
+      - ./_docker/postgres/conf/:/etc/postgresql/:rw
+      - ./_docker/postgres/log/:/var/log/postgresql/:rw
+      - pgdata:/var/lib/postgresql/${PGVERSION}/main
+      # - ./_docker/postgres/docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d/:ro
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 25s
+      timeout: 25s
+      retries: 5
+      start_period: 60s
+    
+  # php-fpm:
+    # image:php 
+  
+  backend:
+    container_name: "bs_server"
+    build: 
+      context: "_docker/backend"
+      dockerfile: Dockerfile
+    depends_on:
+        # CHANGE 2: it prevents issuing a request while the server is starting to depend on the healthy status of postgres-db 
+    - postgres
+          # condition: service_healthy
+    
+    volumes:
+      - ./_docker/backend/conf.d/:/etc/nginx/conf.d/:rw
+
+
+# networks:
+  # postgres-net:
+    # mode: "bridge"
+
+volumes:
+  pgdata:
+    driver: local     
+

@@ -1,0 +1,11 @@
+# **/log
+
+# IDE files
+**/.git
+**/.vscode
+**/.idea
+
+
+# libs
+# **/node_modules/*
+# **/vendor/*

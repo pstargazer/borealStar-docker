@@ -1,0 +1,12 @@
+*.zip
+config/*
+.git/
+
+./backend/*
+./frontend/*
+
+**/.vscode
+**/.git/
+
+*.env*
+!.env.example
