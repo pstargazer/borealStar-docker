@@ -1,4 +1,6 @@
-FROM node:20
+FROM node:20-alpine
+
+COPY ./_docker/frontend/conf/hosts /etc/
 
 ENV BRANCH master
 ENV CMD_PATH /var/www/html/$BRANCH
@@ -11,4 +13,4 @@ COPY ./backend/ .
 RUN npm i --save-exact
 
 
-ENTRYPOINT ["npm", "run", "dev"]
+ENTRYPOINT ["npm", "run", "start"]

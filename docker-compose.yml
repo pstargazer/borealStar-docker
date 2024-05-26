@@ -22,9 +22,10 @@ services:
     env_file: .env.postgres
     volumes:
       - pgdata:/var/lib/postgresql/
+      - ./_docker/postgres_dev/dumps:/opt/dumps/:rw
     healthcheck:
       test: ["CMD-SHELL", "pg_isready --quiet"]
-      interval: 40s
+      interval: 10s
       timeout: 40s
       retries: 5
     
@@ -41,36 +42,41 @@ services:
     depends_on:
       database:
         condition: service_healthy
-    expose:
-      - 443
 
 
   backend:
     container_name: "bs_backend"
     build: 
       context: .
-      dockerfile: _docker/backend/Dockerfile
+      dockerfile: _docker/backend/Dockerfile.alpine
 
     expose:
       - 8000
+      - 443
+    # ports:
+      # - 82:8000
+      
     depends_on:
       database:
         condition: service_healthy
     volumes:
-      - ./_docker/backend/conf.d/:/etc/:rw
+      # - ./_docker/backend/conf.d/:/etc/:rw
+      - ./_docker/backend/periodic/:/etc/crontabs/
       - backend_storage:/var/www/html/master/storage/:rw
-      - ./backend/:/var/www/html
-      - ./_docker/backend/php.ini:/usr/local/etc/php/php.ini-development:ro
+      - ./backend/:/var/www/html:rw
+      # - ./_docker/backend/php.ini:/usr/local/etc/php/php.ini-development:ro
 
 
   frontend:
     container_name: "bs_frontend"
     volumes:
-      - ./frontend/:/var/www/html
+      - ./frontend/:/var/www/html:rw
     build: 
       context: .
       dockerfile: _docker/frontend/Dockerfile
 
+    expose:
+      - 5173
     ports:
     - 81:5173
 

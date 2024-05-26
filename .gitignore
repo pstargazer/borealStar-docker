@@ -10,3 +10,10 @@ config/*
 
 *.env*
 !.env.example
+
+
+*.json
+
+
+# crond logs 
+0

@@ -2,6 +2,7 @@ dump/**
 log/**
 disabled/*
 
+*dump*
 docker-entrypoint-initdb.d/20-bs-dump.sql
 
 
