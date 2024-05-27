@@ -59,12 +59,15 @@ services:
     depends_on:
       database:
         condition: service_healthy
+      
+    environment:
+      - CMD_PATH=/app/
     volumes:
       # - ./_docker/backend/conf.d/:/etc/:rw
       - ./_docker/backend/periodic/:/etc/crontabs/
       - backend_storage:/var/www/html/master/storage/:rw
-      - ./backend/:/var/www/html:rw
-      # - ./_docker/backend/php.ini:/usr/local/etc/php/php.ini-development:ro
+      - ./backend/:/app/:rw
+      # - ./backend/:/var/www/html:rw
 
 
   frontend:
@@ -80,3 +83,5 @@ services:
     ports:
     - 81:5173
 
+# extra_hosts:
+# - 

@@ -1,11 +1,9 @@
 FROM postgis/postgis:16-3.4
 
-COPY ./docker-entrypoint-initdb.d /docker-entrypoint-initdb.d/
 # COPY ./entrypoint.sh /opt/
 COPY ./pgconf/ /tmp/pgconf/
 
-
+ONBUILD RUN cp /tmp/pgconf/* --target-directory=$PGDATA
+ONBUILD COPY ./docker-entrypoint-initdb.d /docker-entrypoint-initdb.d/
 EXPOSE 5432
-# CMD [ "su", "postgres", "-c", "postgres" ]
 CMD [ "postgres" ]
-# ENTRYPOINT [ "/run.sh" ]

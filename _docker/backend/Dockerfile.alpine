@@ -1,39 +1,47 @@
-# FROM debian:bookworm
 FROM alpine:3.19
 FROM php:8.1-fpm-alpine
 FROM composer:latest
 
-# crond is part of the openrc
-RUN apk add openrc busybox --no-cache 
+ENV USERNAME docker
+ENV USERGROUP proccess
+ENV CMD_PATH /app
+ENV ENTRY_PREFIX /srv
+# ENV CMD_PATH /var/www/html/
 
-ENV CMD_PATH /var/www/html/
-
-# copy code
-WORKDIR "/var/www/html/"
-COPY ./backend/ .
 
 # prerequesite for php extentions 
-RUN apk add \
-            libpq-dev  
+RUN apk add libpq-dev  
 
-# php
+# configure php and ext/
 ADD _docker/backend/conf/php/php.ini-development /usr/local/etc/php/php.ini-development
-# ADD _docker/backend/conf/php/php.ini /usr/local/etc/php/php.ini
 RUN docker-php-ext-configure pdo_pgsql
 RUN docker-php-ext-install pdo_pgsql
 
-RUN mkdir /etc/crontab/
-ADD ./_docker/backend/periodic/ /etc/crontabs/
-ADD ./_docker/backend/periodic/ /var/spool/cron/crontabs
-# ADD ./_docker/backend/periodic /var/spool/cron/crontabs/
+# crond is part of the openrc
+RUN apk add openrc \
+            busybox \
+            --no-cache 
 
-# copy files in etc root
-COPY ./_docker/backend/conf/etc/ /etc/
+# RUN mkdir /etc/crontab/
+# ADD ./_docker/backend/periodic/ /var/spool/cron/crontabs
+ADD --chown=${USERGROUP} ./_docker/backend/periodic/ /etc/crontabs/ 
 
-COPY _docker/backend/entrypoint.sh /tmp/
-RUN chmod 777 /tmp/entrypoint.sh
+RUN chmod -R 777 /var/log
 
-RUN composer install
+# set proccess user
+RUN addgroup -g 2000 ${USERGROUP} \
+    && adduser -u 2000 -G ${USERGROUP} -s /bin/sh -D ${USERNAME}
+USER ${USERNAME}
 
-ENTRYPOINT [ "/bin/bash", "/tmp/entrypoint.sh" ]
-# CMD ["php", "artisan", "serve"]
+# copy conf files in etc root
+ADD --chmod=555 ./_docker/backend/conf/etc/ /etc/
+
+# copy code
+ONBUILD WORKDIR ${CMD_PATH}
+ONBUILD COPY ./backend/ .
+ONBUILD RUN composer install
+
+ADD --chown={USERGROUP} --chmod=775 _docker/backend/entrypoint.sh ${ENTRY_PREFIX}/
+CMD ["/sbin/init"]
+ENTRYPOINT /bin/bash $ENTRY_PREFIX/entrypoint.sh
+# ENTRYPOINT [ "/bin/bash", "$ENTRY_PREFIX/entrypoint.sh" ]

@@ -37,7 +37,6 @@ RUN apt update -y
 
 # RUN apt-get install -y \
 RUN apt-get install -y \ 
-
     # --fix-missing \
     libpq-dev \
     php-common=2:93 \
