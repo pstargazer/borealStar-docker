@@ -44,7 +44,7 @@ WORKDIR ${CMD_PATH}
 ADD --chown=${USERNAME}:${USERGROUP} --chmod=775 ./backend/ .
 
 
-RUN su -c "chmod -R 775 ${CMD_PATH}"
+RUN su -c "chmod -R 777 ${CMD_PATH}"
 RUN su -c "chown -R 2000:${USERGROUP} ${CMD_PATH}/*"
 
 ADD --chown=${USERNAME}:${USERGROUP} --chmod=775 _docker/backend/entrypoint.sh ${ENTRY_PREFIX}/
