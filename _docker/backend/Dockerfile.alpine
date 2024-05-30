@@ -37,7 +37,6 @@ RUN addgroup -g 2000 ${USERGROUP} \
 RUN su -c "chmod -R 775 ${CMD_PATH}"
 RUN su -c "chown -R ${USERNAME}:${USERGROUP} ${CMD_PATH}"
 
-USER ${USERNAME}
 
 # copy conf files in etc root
 ADD --chmod=555 ./_docker/backend/conf/etc/ /etc/
@@ -45,10 +44,10 @@ ADD --chmod=555 ./_docker/backend/conf/etc/ /etc/
 # copy code
 WORKDIR ${CMD_PATH}
 ADD --chown=${USERNAME}:${USERGROUP} --chmod=775 ./backend/ .
-RUN su -c "chown -R ${USERNAME}:${USERGROUP} . && "\
-    su -c "chmod -R 775 "
+
 
 ADD --chown=${USERNAME}:${USERGROUP} --chmod=775 _docker/backend/entrypoint.sh ${ENTRY_PREFIX}/
 
+USER ${USERNAME}
 CMD ["/sbin/init"]
 ENTRYPOINT /bin/bash $ENTRY_PREFIX/entrypoint.sh
