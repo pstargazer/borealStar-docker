@@ -14,6 +14,9 @@ touch ${PHP_LOG_NAME}
 crond -fS -L 0 -d 0 & #${CRON_LOG_NAME} &
 cd ${SRV_PATH} 
 
+pwd 
+ls -l
+
 if [ -d ./vendor ]; then
     echo "deps is okay"
 else
