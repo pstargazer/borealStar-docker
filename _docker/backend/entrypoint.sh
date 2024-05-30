@@ -21,5 +21,5 @@ else
     composer install 
 fi
 
-php artisan serve  && fg > ${PHP_LOG_NAME} 
+php artisan serve && fg > ${PHP_LOG_NAME} 
 # nohup crond -bS -L 0 -d 0 -c "/etc/periodic" & nohup php artisan serve  && fg
