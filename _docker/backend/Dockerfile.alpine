@@ -32,6 +32,11 @@ RUN chmod -R 777 /var/log
 # set proccess user
 RUN addgroup -g 2000 ${USERGROUP} \
     && adduser -u 2000 -G ${USERGROUP} -s /bin/sh -D ${USERNAME}
+
+
+RUN chmod -R 775 ${CMD_PATH} 
+RUN chown -R ${USERNAME}:${USERGROUP} ${CMD_PATH} 
+
 USER ${USERNAME}
 
 # copy conf files in etc root
