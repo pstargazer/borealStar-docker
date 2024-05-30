@@ -65,8 +65,8 @@ services:
     volumes:
       # - ./_docker/backend/conf.d/:/etc/:rw
       - ./_docker/backend/periodic/:/etc/crontabs/
-      - backend_storage:/var/www/html/master/storage/:rw
-      - ./backend/:/app/:rw
+      - backend_storage:/app/storage/
+      - ./backend/:/app/
       # - ./backend/:/var/www/html:rw
 
 
