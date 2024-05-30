@@ -39,7 +39,7 @@ ADD --chmod=555 ./_docker/backend/conf/etc/ /etc/
 
 # copy code
 WORKDIR ${CMD_PATH}
-COPY ./backend/ .
+ADD --chown=${USERNAME}:${USERGROUP} ./backend/ .
 # RUN composer install
 
 ADD --chown={USERGROUP} --chmod=775 _docker/backend/entrypoint.sh ${ENTRY_PREFIX}/
