@@ -11,8 +11,8 @@ ENV CMD_PATH /app
 
 
 # set proccess user
-RUN addgroup -g 2000 ${USERGROUP} \
-    && adduser -u 2000 -G ${USERGROUP} -s /bin/sh -D ${USERNAME}
+RUN addgroup -g 1000 ${USERGROUP} \
+    && adduser -u 1000 -G ${USERGROUP} -s /bin/sh -D ${USERNAME}
 USER ${USERNAME}
 
 # RUN npm i --save-exact
