@@ -28,7 +28,11 @@ services:
       interval: 10s
       timeout: 40s
       retries: 5
-    
+
+    profiles:
+    - local
+    - production
+
     expose:
       - 5432
 
@@ -53,8 +57,8 @@ services:
     expose:
       - 8000
       - 443
-    # ports:
-      # - 82:8000
+    profiles:
+    - local
       
     depends_on:
       database:
@@ -69,7 +73,30 @@ services:
       - ./backend/:/app/
       # - ./backend/:/var/www/html:rw
 
+  backend_production:
+    container_name: "bs_backend"
+    build: 
+      context: .
+      dockerfile: _docker/backend/Dockerfile.alpine
 
+    expose:
+      - 8000
+      - 443
+    profiles:
+    - production
+      
+    depends_on:
+      database:
+        condition: service_healthy
+      
+    environment:
+      - CMD_PATH=/app/
+    volumes:
+      # - ./_docker/backend/conf.d/:/etc/:rw
+      - ./_docker/backend/periodic/:/etc/crontabs/
+      - backend_storage:/app/storage/
+      - ./backend/:/app/
+      # - ./backend/:/var/www/html:rw
   frontend:
     container_name: "bs_frontend"
     volumes:
@@ -77,6 +104,10 @@ services:
     build: 
       context: .
       dockerfile: _docker/frontend/Dockerfile
+
+    profiles:
+    - local
+    - production
 
     expose:
       - 5173
