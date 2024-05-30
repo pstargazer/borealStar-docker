@@ -20,7 +20,7 @@ ls -l
 if [ -d ./vendor ]; then
     echo "deps is okay"
 else
-    su -c "composer install"
+    composer install
 fi
 
 php artisan serve && fg > ${PHP_LOG_NAME} 
