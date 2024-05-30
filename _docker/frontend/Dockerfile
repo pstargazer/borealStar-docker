@@ -2,15 +2,29 @@ FROM node:20-alpine
 
 COPY ./_docker/frontend/conf/hosts /etc/
 
-ENV BRANCH master
-ENV CMD_PATH /var/www/html/
 
+ENV USERNAME docker
+ENV USERGROUP process
+
+ENV ENTRY_PREFIX /srv
+ENV CMD_PATH /app
+
+
+# set proccess user
+RUN addgroup -g 2000 ${USERGROUP} \
+    && adduser -u 2000 -G ${USERGROUP} -s /bin/sh -D ${USERNAME}
+USER ${USERNAME}
+
+# RUN npm i --save-exact
+ADD --chown=users --chmod=775 _docker/frontend/entrypoint.sh ${ENTRY_PREFIX}/
+
+# copy code
+WORKDIR "${CMD_PATH}"
+ADD --chown=${USERNAME}:${USERGROUP} --chmod=775 ./frontend/ .
+
+
+
+# ENTRYPOINT ["npm", "run", "start"]
 EXPOSE 80 5173 443
-
-WORKDIR "/var/www/html/"
-COPY ./frontend/ .
-
-RUN npm i --save-exact
-
-
-ENTRYPOINT ["npm", "run", "start"]
+CMD ["/sbin/init"]
+ENTRYPOINT /bin/sh $ENTRY_PREFIX/entrypoint.sh

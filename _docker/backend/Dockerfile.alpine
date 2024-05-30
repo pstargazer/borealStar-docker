@@ -4,6 +4,7 @@ FROM composer:latest
 
 ENV USERNAME docker
 ENV USERGROUP proccess
+
 ENV CMD_PATH /app
 ENV ENTRY_PREFIX /srv
 # ENV CMD_PATH /var/www/html/
@@ -37,9 +38,9 @@ USER ${USERNAME}
 ADD --chmod=555 ./_docker/backend/conf/etc/ /etc/
 
 # copy code
-ONBUILD WORKDIR ${CMD_PATH}
-ONBUILD COPY ./backend/ .
-ONBUILD RUN composer install
+WORKDIR ${CMD_PATH}
+COPY ./backend/ .
+# RUN composer install
 
 ADD --chown={USERGROUP} --chmod=775 _docker/backend/entrypoint.sh ${ENTRY_PREFIX}/
 CMD ["/sbin/init"]
