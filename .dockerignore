@@ -5,6 +5,8 @@
 **/.vscode
 **/.idea
 
+# to prevent composer errors
+composer.lock
 
 # libs
 # **/node_modules/*
