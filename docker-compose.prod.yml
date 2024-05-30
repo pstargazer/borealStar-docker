@@ -1,62 +1,66 @@
-version: '3.9'
-
-
-
-
 services:
-  postgres:
-    container_name: "bs_db"
-    
+
+  database:
+    # image: postgres:latest
     build: 
-      context: "_docker/postgres"     
-      dockerfile: Dockerfile
+      context: _docker/postgres/
+      dockerfile: Dockerfile.dev
+    container_name: "bs_db"
+    restart: unless-stopped
+    env_file: .env.postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/
+      - ./_docker/postgres/dumps:/opt/dumps/:rw
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready --quiet"]
+      interval: 10s
+      timeout: 40s
+      retries: 5
+
     expose:
       - 5432
-    environment:
-      - PGVERSION=16
-      - PGCLUSTERNAME=main
-      - PGDATA=/var/lib/postgresql/$PGVERSION/$PGCLUSTERNAME
-      - PGCONF=/etc/postgresql/$PGVERSION/$PGCLUSTERNAME
-      - PG_LOG=/var/log/postgres.log
-      - POSTGRES_USER=docker 
-      - POSTGRES_PASSWORD=docker5820?
-      - POSTGRES_DB=borealstar
 
-    volumes:
-      - ./_docker/postgres/conf/:/etc/postgresql/:rw
-      - ./_docker/postgres/log/:/var/log/postgresql/:rw
-      - pgdata:/var/lib/postgresql/${PGVERSION}/main
-      # - ./_docker/postgres/docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d/:ro
 
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
-      interval: 25s
-      timeout: 25s
-      retries: 5
-      start_period: 60s
-    
-  # php-fpm:
-    # image:php 
-  
-  backend:
-    container_name: "bs_server"
-    build: 
-      context: "_docker/backend"
-      dockerfile: Dockerfile
+  adminer:
+    container_name: "bs_adminer"
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
     depends_on:
-        # CHANGE 2: it prevents issuing a request while the server is starting to depend on the healthy status of postgres-db 
-    - postgres
-          # condition: service_healthy
-    
+      database:
+        condition: service_healthy
+
+  backend_production:
+    container_name: "bs_backend"
+    build: 
+      context: .
+      dockerfile: _docker/backend/Dockerfile.alpine.prod
+
+    expose:
+      - 8000
+      - 443
+      
+    depends_on:
+      database:
+        condition: service_healthy
+      
+    environment:
+      - CMD_PATH=/app/
     volumes:
-      - ./_docker/backend/conf.d/:/etc/nginx/conf.d/:rw
+      # - ./_docker/backend/conf.d/:/etc/:rw
+      - ./_docker/backend/periodic/:/etc/crontabs/
+      - backend_storage:/app/storage/
+      # - ./backend/:/var/www/html:rw
+  frontend:
+    container_name: "bs_frontend"
+    volumes:
+      - ./frontend/:/var/www/html:rw
+    build: 
+      context: .
+      dockerfile: _docker/frontend/Dockerfile
 
-
-# networks:
-  # postgres-net:
-    # mode: "bridge"
-
-volumes:
-  pgdata:
-    driver: local     
-
+    expose:
+      - 5173
+    ports:
+    - 81:5173
