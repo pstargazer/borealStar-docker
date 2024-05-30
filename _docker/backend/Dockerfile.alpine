@@ -30,9 +30,10 @@ ADD --chown=${USERGROUP} ./_docker/backend/periodic/ /etc/crontabs/
 RUN chmod -R 777 /var/log
 
 # set proccess user
-RUN addgroup -g 2000 ${USERGROUP} \
-    && adduser -u 2000 -G ${USERGROUP} -s /bin/sh -D ${USERNAME}
+# RUN addgroup -g 2000 ${USERGROUP} \
+#     && adduser -u 2000 -G ${USERGROUP} -s /bin/sh -D ${USERNAME}
 
+RUN adduser -u 2000 -G users -s /bin/sh -D ${USERNAME}
 
 
 
