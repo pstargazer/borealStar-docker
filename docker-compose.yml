@@ -15,14 +15,14 @@ services:
   database:
     # image: postgres:latest
     build: 
-      context: _docker/postgres_dev/
-      dockerfile: dockerfile
+      context: _docker/postgres/
+      dockerfile: Dockerfile.dev
     container_name: "bs_db"
     restart: unless-stopped
     env_file: .env.postgres
     volumes:
       - pgdata:/var/lib/postgresql/
-      - ./_docker/postgres_dev/dumps:/opt/dumps/:rw
+      - ./_docker/postgres/dumps:/opt/dumps/:rw
     healthcheck:
       test: ["CMD-SHELL", "pg_isready --quiet"]
       interval: 10s
