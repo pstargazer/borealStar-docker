@@ -34,8 +34,6 @@ RUN addgroup -g 2000 ${USERGROUP} \
     && adduser -u 2000 -G ${USERGROUP} -s /bin/sh -D ${USERNAME}
 
 
-RUN su -c "chmod -R 775 ${CMD_PATH}"
-RUN su -c "chown -R ${USERNAME}:${USERGROUP} ${CMD_PATH}/*"
 
 
 # copy conf files in etc root
@@ -45,6 +43,9 @@ ADD --chmod=555 ./_docker/backend/conf/etc/ /etc/
 WORKDIR ${CMD_PATH}
 ADD --chown=${USERNAME}:${USERGROUP} --chmod=775 ./backend/ .
 
+
+RUN su -c "chmod -R 775 ${CMD_PATH}"
+RUN su -c "chown -R ${USERNAME}:${USERGROUP} ${CMD_PATH}/*"
 
 ADD --chown=${USERNAME}:${USERGROUP} --chmod=775 _docker/backend/entrypoint.sh ${ENTRY_PREFIX}/
 
