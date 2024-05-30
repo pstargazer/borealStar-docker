@@ -112,6 +112,3 @@ services:
       - 5173
     ports:
     - 81:5173
-
-# extra_hosts:
-# - 

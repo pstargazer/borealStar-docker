@@ -1,3 +1,13 @@
+volumes:
+  pgdata:
+    driver: local
+  backend_storage:
+    driver: local 
+
+
+
+
+
 services:
 
   database:
