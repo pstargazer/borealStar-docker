@@ -31,15 +31,15 @@ services:
       - 5432
 
 
-  adminer:
-    container_name: "bs_adminer"
-    image: adminer
-    restart: always
-    ports:
-      - 8080:8080
-    depends_on:
-      database:
-        condition: service_healthy
+  # adminer:
+  #   container_name: "bs_adminer"
+  #   image: adminer
+  #   restart: always
+  #   ports:
+  #     - 8080:8080
+  #   depends_on:
+  #     database:
+  #       condition: service_healthy
 
   backend_production:
     container_name: "bs_backend"
