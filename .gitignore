@@ -9,7 +9,7 @@ config/*
 **/.git/
 
 *.env*
-!.env.example
+!.env*example
 
 
 *.json
