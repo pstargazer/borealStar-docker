@@ -9,16 +9,25 @@ volumes:
     driver: local 
 
 
+networks:
+  bsnet0:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.16.0.0/16
+        ip_range: 172.16.0.0/24 
+        # gateway: 172.16.255.255
+        # gateway: 172.16.0.4
 
 services:
-
+  # database development
   database:
     build: 
       context: _docker/postgres/
       dockerfile: Dockerfile.dev
     container_name: "bs_db"
     restart: unless-stopped
-    env_file: .env.postgres
     volumes:
       - pgdata:/var/lib/postgresql/
       - ./_docker/postgres/dumps:/opt/dumps/:rw
@@ -28,24 +37,17 @@ services:
       timeout: 40s
       retries: 5
 
-    # profiles:
-    # - local
-    # - production
+    profiles:
+    - local
+    - prod
 
+    networks:
+      bsnet0:
+        ipv4_address: 172.16.0.1
     expose:
       - 5432
 
-  adminer:
-    container_name: "bs_adminer"
-    image: adminer
-    restart: always
-    ports:
-      - 8080:8080
-    depends_on:
-      database:
-        condition: service_healthy
-
-
+  # backend development
   backend:
     container_name: "bs_backend"
     build: 
@@ -81,9 +83,55 @@ services:
 
     profiles:
     - local
-    - production
+    - prod
 
+    networks:
+      bsnet0:
+        ipv4_address: 172.16.0.4
     expose:
       - 5173
     ports:
     - 81:5173
+  
+
+  # future production backend 
+  backend_prod:
+    container_name: bs_backend_prod
+    build: 
+      context: .
+      dockerfile: _docker/backend/Dockerfile.alpine.prod
+    expose:
+      - 8000
+      - 443
+    networks:
+      bsnet0:
+        ipv4_address: 172.16.0.2
+
+    profiles:
+    - prod
+      
+    depends_on:
+      database:
+        condition: service_healthy
+      
+    environment:
+      - CMD_PATH=/app/
+    volumes:
+      # - ./_docker/backend/conf.d/:/etc/:rw
+      - ./_docker/backend/periodic/:/etc/crontabs/
+      - backend_storage:/app/storage/
+      - ./backend/:/app/
+      # - ./backend/:/var/www/html:rw
+
+  # db adminer
+  adminer:
+    container_name: "bs_adminer"
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      database:
+        condition: service_healthy
+    profiles:
+    - local
