@@ -2,7 +2,7 @@ FROM alpine:3.19
 FROM php:8.1-fpm-alpine
 FROM composer:latest
 
-ENV USERNAME docker
+ENV USERNAME process
 ENV USERGROUP proccess
 
 ENV CMD_PATH /app
@@ -23,17 +23,17 @@ RUN apk add openrc \
             busybox \
             --no-cache 
 
-# RUN mkdir /etc/crontab/
-# ADD ./_docker/backend/periodic/ /var/spool/cron/crontabs
-ADD --chown=${USERGROUP} ./_docker/backend/periodic/ /etc/crontabs/ 
+
+ADD ./_docker/backend/conf/periodic-spool/ /var/spool/cron/crontabs/
+ADD --chown=${USERGROUP} ./_docker/backend/conf/periodic-etc/ /etc/periodic/ 
 
 RUN chmod -R 777 /var/log
 
 # set proccess user
+RUN adduser -u 2000 -G users -s /bin/sh -D ${USERNAME}
 # RUN addgroup -g 2000 ${USERGROUP} \
 #     && adduser -u 2000 -G ${USERGROUP} -s /bin/sh -D ${USERNAME}
 
-RUN adduser -u 2000 -G users -s /bin/sh -D ${USERNAME}
 
 
 

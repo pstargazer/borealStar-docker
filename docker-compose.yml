@@ -12,11 +12,11 @@ volumes:
 networks:
   bsnet0:
     driver: bridge
-    ipam:
-      driver: default
-      config:
-      - subnet: 172.16.0.0/16
-        ip_range: 172.16.0.0/24 
+    # ipam:
+      # driver: default
+      # config:
+      # - subnet: 172.16.0.0/16
+        # ip_range: 172.16.5.0/24 
         # gateway: 172.16.255.255
         # gateway: 172.16.0.4
 
@@ -43,7 +43,7 @@ services:
 
     networks:
       bsnet0:
-        ipv4_address: 172.16.0.1
+        # ipv4_address: 172.16.0.1
     expose:
       - 5432
 
@@ -87,7 +87,7 @@ services:
 
     networks:
       bsnet0:
-        ipv4_address: 172.16.0.4
+        # ipv4_address: 172.16.0.4
     expose:
       - 5173
     ports:
@@ -105,7 +105,7 @@ services:
       - 443
     networks:
       bsnet0:
-        ipv4_address: 172.16.0.2
+        # ipv4_address: 172.16.0.2
 
     profiles:
     - prod
@@ -135,3 +135,5 @@ services:
         condition: service_healthy
     profiles:
     - local
+
+# * * * * * /usr/bin/php /app/artisan schedule:run
