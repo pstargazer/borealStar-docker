@@ -3,15 +3,18 @@ FROM php:8.1-fpm-alpine
 FROM composer:latest
 
 ENV USERNAME process
-ENV USERGROUP proccess
+ENV USERGROUP users
 
 ENV CMD_PATH /app
 ENV ENTRY_PREFIX /srv
 # ENV CMD_PATH /var/www/html/
 
+# set proccess user
+RUN adduser -u 2000 -G users -s /bin/sh -D ${USERNAME}
 
 # prerequesite for php extentions 
-RUN apk add libpq-dev  
+RUN apk add libpq-dev 
+
 
 # configure php and ext/
 ADD _docker/backend/conf/php/php.ini-development /usr/local/etc/php/php.ini-development
@@ -21,20 +24,27 @@ RUN docker-php-ext-install pdo_pgsql
 # crond is part of the openrc
 RUN apk add openrc \
             busybox \
+            # to use setcap
+            libcap \
             --no-cache 
+# permit to crond t use su
+# RUN su -c "setcap cap_sys_admin+epi /bin/busybox -l"
+# RUN setcap cap_sys_admin+ep $(readlink -f /usr/sbin/crond) -fl
+# RUN setcap CAP_SETGID+ep /bin/busybox -f
+RUN chgrp -R 0 /bin/busybox 
+
+# $(readlink -f ~username/.linuxbrew/node)
 
 
-ADD ./_docker/backend/conf/periodic-spool/ /var/spool/cron/crontabs/
-ADD --chown=${USERGROUP} ./_docker/backend/conf/periodic-etc/ /etc/periodic/ 
-
+# copy crontabs 
+ADD ./_docker/backend/conf/periodic-spool/ /etc/crontabs/
+ADD ./_docker/backend/conf/periodic-etc/ /etc/periodic/ 
+# configure caps for cron
+# RUN setcap cap_setgid+ep /usr/sbin/crond
+# log directory
+RUN mkdir /var/log/server
 RUN chmod -R 777 /var/log
-
-# set proccess user
-RUN adduser -u 2000 -G users -s /bin/sh -D ${USERNAME}
-# RUN addgroup -g 2000 ${USERGROUP} \
-#     && adduser -u 2000 -G ${USERGROUP} -s /bin/sh -D ${USERNAME}
-
-
+RUN chown ${USERNAME}:${USERGROUP} /var/log/server -R
 
 
 # copy conf files in etc root
@@ -50,6 +60,6 @@ RUN su -c "chown -R 2000:users ${CMD_PATH}/*"
 
 ADD --chown=${USERNAME}:users --chmod=775 _docker/backend/entrypoint.sh ${ENTRY_PREFIX}/
 
-USER ${USERNAME}
-CMD ["/sbin/init"]
+# USER ${USERNAME}
+# CMD ["/sbin/init"]
 ENTRYPOINT /bin/bash $ENTRY_PREFIX/entrypoint.sh

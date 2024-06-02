@@ -21,11 +21,12 @@ RUN docker-php-ext-install pdo_pgsql
 # crond is part of the openrc
 RUN apk add openrc \
             busybox \
+            # cap \
             --no-cache 
 
 # RUN mkdir /etc/crontab/
 # ADD ./_docker/backend/periodic/ /var/spool/cron/crontabs
-ADD --chown=${USERGROUP} ./_docker/backend/periodic/ /etc/crontabs/ 
+ADD --chown=${USERNAME}:${USERGROUP} ./_docker/backend/periodic/ /etc/crontabs/ 
 
 RUN chmod -R 777 /var/log
 

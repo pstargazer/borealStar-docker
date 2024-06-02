@@ -1,14 +1,17 @@
 
 
 SRV_PATH=$CMD_PATH
-mkdir /var/log/server
-export PHP_LOG_NAME=/var/log/server/php_$(date +"%d-%m-%Y")
-export CRON_LOG_NAME=/var/log/server/cron_$(date +"%d-%m-%Y")
+export LOG_PATH=/var/log/server/
+mkdir $LOG_PATH
+export PHP_LOG_NAME=$LOG_PATH/php_$(date +"%d-%m-%Y")
+export CRON_LOG_NAME=$LOG_PATH/cron_$(date +"%d-%m-%Y")
 CROND_PATH=$CRON_LOG_NAME
 
-cd /var/log/server
+cd $LOG_PATH
 touch $CRON_LOG_NAME
 touch $PHP_LOG_NAME
+touch /var/log
+# chown $(whoami):users $LOG_PATH -R
 
 cd ${SRV_PATH} 
 
@@ -21,5 +24,6 @@ fi
 
 
 cd ${SRV_PATH} && php artisan serve & 
-cd /var/log/server && crond -f -l 0 -d 0  &
+cd $LOG_PATH && busybox crond -f -l 0 -d 0 &
+# cd $LOG_PATH && crond -d 6 -f &
 wait -n

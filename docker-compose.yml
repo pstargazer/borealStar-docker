@@ -67,11 +67,8 @@ services:
     environment:
       - CMD_PATH=/app/
     volumes:
-      # - ./_docker/backend/conf.d/:/etc/:rw
-      - ./_docker/backend/periodic/:/etc/crontabs/
       - backend_storage:/app/storage/
       - ./backend/:/app/
-      # - ./backend/:/var/www/html:rw
 
   frontend:
     container_name: "bs_frontend"
@@ -117,11 +114,8 @@ services:
     environment:
       - CMD_PATH=/app/
     volumes:
-      # - ./_docker/backend/conf.d/:/etc/:rw
-      - ./_docker/backend/periodic/:/etc/crontabs/
       - backend_storage:/app/storage/
       - ./backend/:/app/
-      # - ./backend/:/var/www/html:rw
 
   # db adminer
   adminer:
@@ -136,4 +130,3 @@ services:
     profiles:
     - local
 
-# * * * * * /usr/bin/php /app/artisan schedule:run
