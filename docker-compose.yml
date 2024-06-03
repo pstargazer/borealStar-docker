@@ -66,6 +66,10 @@ services:
       
     environment:
       - CMD_PATH=/app/
+
+    networks:
+      bsnet0:
+      
     volumes:
       - backend_storage:/app/storage/
       - ./backend/:/app/
@@ -127,6 +131,8 @@ services:
     depends_on:
       database:
         condition: service_healthy
+    networks:
+      - bsnet0
     profiles:
     - local
 

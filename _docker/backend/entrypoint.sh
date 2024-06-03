@@ -24,6 +24,6 @@ fi
 
 
 cd ${SRV_PATH} && php artisan serve & 
-cd $LOG_PATH && busybox crond -f -l 0 -d 0 &
+cd $LOG_PATH && busybox crond -f -l 0 -d 8 &
 # cd $LOG_PATH && crond -d 6 -f &
 wait -n
