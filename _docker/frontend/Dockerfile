@@ -26,5 +26,5 @@ ADD --chown=${USERNAME}:${USERGROUP} --chmod=775 ./frontend/ .
 
 # ENTRYPOINT ["npm", "run", "start"]
 EXPOSE 80 5173 443
-CMD ["/sbin/init"]
+# CMD ["/sbin/init"]
 ENTRYPOINT /bin/sh $ENTRY_PREFIX/entrypoint.sh

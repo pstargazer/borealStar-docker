@@ -3,7 +3,12 @@ FROM postgis/postgis:16-3.4
 # COPY ./entrypoint.sh /opt/
 COPY ./pgconf/ /tmp/pgconf/
 
-# RUN cp /tmp/pgconf/* --target-directory=$PGDATA
+# install ps
+RUN apt-get update && apt-get install procps -y
+
+
+COPY ./entrypoint.sh /tmp/
 COPY ./docker-entrypoint-initdb.d /docker-entrypoint-initdb.d/
 EXPOSE 5432
 CMD [ "postgres" ]
+ENTRYPOINT [ "/tmp/entrypoint.sh" ]
