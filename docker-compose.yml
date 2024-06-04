@@ -1,5 +1,5 @@
 # version: '3.9'
-version: "3.3"
+# version: "3.3"
 
 
 volumes:
@@ -12,13 +12,14 @@ volumes:
 networks:
   bsnet0:
     driver: bridge
-    ipam:
-      driver: default
-      config:
-      - subnet: 172.16.0.0/16
-        ip_range: 172.16.0.0/24 
+    # ipam:
+      # driver: default
+      # config:
+      # - subnet: 172.16.0.0/16
+        # ip_range: 172.16.5.0/24 
         # gateway: 172.16.255.255
         # gateway: 172.16.0.4
+
 
 services:
   # database development
@@ -37,13 +38,15 @@ services:
       timeout: 40s
       retries: 5
 
+    env_file:
+      - ./_docker/postgres/.env.postgres 
+
     profiles:
     - local
     - prod
 
     networks:
       bsnet0:
-        ipv4_address: 172.16.0.1
     expose:
       - 5432
 
@@ -66,12 +69,13 @@ services:
       
     environment:
       - CMD_PATH=/app/
+
+    networks:
+      bsnet0:
+
     volumes:
-      # - ./_docker/backend/conf.d/:/etc/:rw
-      - ./_docker/backend/periodic/:/etc/crontabs/
       - backend_storage:/app/storage/
       - ./backend/:/app/
-      # - ./backend/:/var/www/html:rw
 
   frontend:
     container_name: "bs_frontend"
@@ -87,7 +91,7 @@ services:
 
     networks:
       bsnet0:
-        ipv4_address: 172.16.0.4
+        # ipv4_address: 172.16.0.4
     expose:
       - 5173
     ports:
@@ -105,7 +109,7 @@ services:
       - 443
     networks:
       bsnet0:
-        ipv4_address: 172.16.0.2
+        # ipv4_address: 172.16.0.2
 
     profiles:
     - prod
@@ -117,11 +121,8 @@ services:
     environment:
       - CMD_PATH=/app/
     volumes:
-      # - ./_docker/backend/conf.d/:/etc/:rw
-      - ./_docker/backend/periodic/:/etc/crontabs/
       - backend_storage:/app/storage/
       - ./backend/:/app/
-      # - ./backend/:/var/www/html:rw
 
   # db adminer
   adminer:
@@ -133,5 +134,8 @@ services:
     depends_on:
       database:
         condition: service_healthy
+    networks:
+      - bsnet0
     profiles:
     - local
+
