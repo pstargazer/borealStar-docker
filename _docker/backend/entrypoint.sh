@@ -15,6 +15,7 @@ touch /var/log
 
 cd ${SRV_PATH} 
 
+composer install
 
 if [ -d ./vendor ]; then
     echo "deps is okay"
