@@ -1,4 +1,4 @@
-FROM alpine:3.19
+# FROM alpine:3.19
 FROM php:8.1-fpm-alpine
 FROM composer:latest
 
@@ -15,11 +15,18 @@ RUN adduser -u 2000 -G users -s /bin/sh -D ${USERNAME}
 # prerequesite for php extentions 
 RUN apk add libpq-dev 
 
+# tools
+RUN apk add lsof
+
 
 # configure php and ext/
 ADD _docker/backend/conf/php/php.ini-development /usr/local/etc/php/php.ini-development
 RUN docker-php-ext-configure pdo_pgsql
 RUN docker-php-ext-install pdo_pgsql
+
+# laravel WSS requesite
+RUN docker-php-ext-install pcntl
+RUN docker-php-ext-configure pcntl --enable-pcntl
 
 # crond is part of the openrc
 RUN apk add openrc \
@@ -59,6 +66,9 @@ RUN su -c "chmod -R 777 ${CMD_PATH}"
 RUN su -c "chown -R 2000:users ${CMD_PATH}/*"
 
 ADD --chown=${USERNAME}:users --chmod=775 _docker/backend/entrypoint.sh ${ENTRY_PREFIX}/
+
+
+EXPOSE 8000 443
 
 # USER ${USERNAME}
 # CMD ["/sbin/init"]

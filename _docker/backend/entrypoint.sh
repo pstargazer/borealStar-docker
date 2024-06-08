@@ -15,7 +15,8 @@ touch /var/log
 
 cd ${SRV_PATH} 
 
-composer install
+# composer update
+# composer install
 
 if [ -d ./vendor ]; then
     echo "deps is okay"
@@ -23,8 +24,10 @@ else
     composer install
 fi
 
-
+# HTTP
 cd ${SRV_PATH} && php artisan serve & 
+# WS
+php artisan reverb:start &
+# crond
 cd $LOG_PATH && busybox crond -f -l 0 -d 8 &
-# cd $LOG_PATH && crond -d 6 -f &
 wait -n

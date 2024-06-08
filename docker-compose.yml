@@ -94,6 +94,7 @@ services:
         # ipv4_address: 172.16.0.4
     expose:
       - 5173
+      - 8000
     ports:
     - 81:5173
   
