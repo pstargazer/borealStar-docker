@@ -10,7 +10,6 @@ CROND_PATH=$CRON_LOG_NAME
 cd $LOG_PATH
 touch $CRON_LOG_NAME
 touch $PHP_LOG_NAME
-touch /var/log
 # chown $(whoami):users $LOG_PATH -R
 
 cd ${SRV_PATH} 
@@ -30,4 +29,6 @@ cd ${SRV_PATH} && php artisan serve &
 php artisan reverb:start &
 # crond
 cd $LOG_PATH && busybox crond -f -l 0 -d 8 &
+# nginx
+nginx -g 'daemon off;' &
 wait -n

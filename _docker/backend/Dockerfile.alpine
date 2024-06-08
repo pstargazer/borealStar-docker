@@ -1,6 +1,8 @@
-# FROM alpine:3.19
-FROM php:8.1-fpm-alpine
-FROM composer:latest
+ARG PHPVERSION=8.2
+
+# FROM nginx:alpine AS nginx
+FROM php:${PHPVERSION}-fpm-alpine AS php-fpm
+# FROM composer:latest AS composer
 
 ENV USERNAME process
 ENV USERGROUP users
@@ -31,13 +33,11 @@ RUN docker-php-ext-configure pcntl --enable-pcntl
 # crond is part of the openrc
 RUN apk add openrc \
             busybox \
-            # to use setcap
-            libcap \
+            composer \
+            nginx \
+            ca-certificates \
             --no-cache 
-# permit to crond t use su
-# RUN su -c "setcap cap_sys_admin+epi /bin/busybox -l"
-# RUN setcap cap_sys_admin+ep $(readlink -f /usr/sbin/crond) -fl
-# RUN setcap CAP_SETGID+ep /bin/busybox -f
+
 RUN chgrp -R 0 /bin/busybox 
 
 # $(readlink -f ~username/.linuxbrew/node)
@@ -61,6 +61,9 @@ ADD --chmod=555 ./_docker/backend/conf/etc/ /etc/
 WORKDIR ${CMD_PATH}
 ADD --chown=${USERNAME}:${USERGROUP} --chmod=775 ./backend/ .
 
+# copy nginx
+COPY ./_docker/backend/conf/nginx/ /etc/nginx/
+
 
 RUN su -c "chmod -R 777 ${CMD_PATH}"
 RUN su -c "chown -R 2000:users ${CMD_PATH}/*"
@@ -68,8 +71,9 @@ RUN su -c "chown -R 2000:users ${CMD_PATH}/*"
 ADD --chown=${USERNAME}:users --chmod=775 _docker/backend/entrypoint.sh ${ENTRY_PREFIX}/
 
 
-EXPOSE 8000 443
+
+EXPOSE 8000 85 8080 443
 
 # USER ${USERNAME}
-# CMD ["/sbin/init"]
-ENTRYPOINT /bin/bash $ENTRY_PREFIX/entrypoint.sh
+# ENTRYPOINT /bin/bash $ENTRY_PREFIX/entrypoint.sh
+ENTRYPOINT /bin/ash $ENTRY_PREFIX/entrypoint.sh

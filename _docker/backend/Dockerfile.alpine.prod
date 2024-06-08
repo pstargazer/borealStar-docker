@@ -1,6 +1,8 @@
+ARG PHPVERSION=8.1
+
 FROM alpine:3.19
-FROM php:8.1-fpm-alpine
-FROM composer:latest
+FROM php:${PHPVERSION}-fpm-alpine AS php-fpm
+FROM composer:latest AS composer
 
 ENV USERNAME process
 ENV USERGROUP proccess
@@ -33,6 +35,9 @@ RUN chmod -R 777 /var/log
 # set proccess user
 # RUN addgroup -g 2000 ${USERGROUP} \
     # && adduser -u 2000 -G ${USERGROUP} -s /bin/sh -D ${USERNAME}
+
+FROM nginx:alpine AS nginx
+
 
 RUN adduser -u 2000 -G users -s /bin/sh -D ${USERNAME}
 
