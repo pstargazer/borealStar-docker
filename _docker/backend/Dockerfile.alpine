@@ -38,6 +38,8 @@ RUN apk add openrc \
             ca-certificates \
             --no-cache 
 
+RUN apk update && apk upgrade
+
 RUN chgrp -R 0 /bin/busybox 
 
 # $(readlink -f ~username/.linuxbrew/node)
@@ -74,6 +76,6 @@ ADD --chown=${USERNAME}:users --chmod=775 _docker/backend/entrypoint.sh ${ENTRY_
 
 EXPOSE 8000 85 8080 443
 
+# using root cause crond cannot work without that
 # USER ${USERNAME}
-# ENTRYPOINT /bin/bash $ENTRY_PREFIX/entrypoint.sh
 ENTRYPOINT /bin/ash $ENTRY_PREFIX/entrypoint.sh

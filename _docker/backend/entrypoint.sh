@@ -26,7 +26,8 @@ fi
 # HTTP
 cd ${SRV_PATH} && php artisan serve & 
 # WS
-php artisan reverb:start &
+php artisan reverb:start --debug &
+php artisan queue:listen &
 # crond
 cd $LOG_PATH && busybox crond -f -l 0 -d 8 &
 # nginx

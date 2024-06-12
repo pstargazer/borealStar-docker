@@ -1,4 +1,5 @@
-*       *       *       *       *       cd $CMD_PATH && php artisan schedule:run
+# sed regex to exclude unsuccessful message
+*       *       *       *       *       cd $CMD_PATH && php artisan schedule:run | sed -e '/No scheduled commands are ready to run\./d'
 #*       *       *       *       *       run-parts /etc/periodic/1min
 #*/15    *       *       *       *       run-parts /etc/periodic/15min
 #0       *       *       *       *       run-parts /etc/periodic/hourly

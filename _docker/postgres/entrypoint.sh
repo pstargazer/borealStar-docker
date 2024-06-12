@@ -17,7 +17,7 @@ dumpdb() {
     local sequenceId=20
     cd $EXPORT_PATH
     # get the dump of database
-    pg_dump borealstar -U $POSTGRES_USER >> $EXPORT_PATH\/${sequenceId}_bs_dump_${middlename}_$(date +%d-%h-%Y-%H:%M:%S).sql
+    pg_dumpall -U $POSTGRES_USER >> $EXPORT_PATH\/${sequenceId}_bs_dump_${middlename}_$(date +%d-%h-%Y-%H:%M:%S).sql
     chown 1000:users $EXPORT_PATH
 }
 

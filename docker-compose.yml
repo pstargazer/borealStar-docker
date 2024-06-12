@@ -60,9 +60,13 @@ services:
     expose:
       - 8000
       - 443
+      - 85
     profiles:
     - local
       
+    ports:
+     - 85:85
+
     depends_on:
       database:
         condition: service_healthy
@@ -80,10 +84,11 @@ services:
   frontend:
     container_name: "bs_frontend"
     volumes:
-      - ./frontend/:/var/www/html:rw
+      - ./frontend/:/app/:rw
     build: 
       context: .
       dockerfile: _docker/frontend/Dockerfile
+
 
     profiles:
     - local
@@ -108,6 +113,8 @@ services:
     expose:
       - 8000
       - 443
+    ports:
+    - 85:85
     networks:
       bsnet0:
         # ipv4_address: 172.16.0.2
