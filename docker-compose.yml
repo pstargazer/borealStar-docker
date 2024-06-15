@@ -64,6 +64,7 @@ services:
       - 85
     profiles:
     - local
+    - nofront
       
     ports:
      - 85:85
@@ -94,7 +95,6 @@ services:
     profiles:
     - local
     - prod
-    - nofront
 
     networks:
       bsnet0:
