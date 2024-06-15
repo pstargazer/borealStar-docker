@@ -44,6 +44,7 @@ services:
     profiles:
     - local
     - prod
+    - nofront
 
     networks:
       bsnet0:
@@ -93,6 +94,7 @@ services:
     profiles:
     - local
     - prod
+    - nofront
 
     networks:
       bsnet0:
