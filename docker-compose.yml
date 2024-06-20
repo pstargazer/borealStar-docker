@@ -28,7 +28,6 @@ services:
       context: _docker/postgres/
       dockerfile: Dockerfile.dev
     container_name: "bs_db"
-    restart: unless-stopped
     volumes:
       - pgdata:/var/lib/postgresql/
       - ./_docker/postgres/dumps:/opt/dumps/:rw

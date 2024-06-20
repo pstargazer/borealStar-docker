@@ -7,20 +7,34 @@ export PHP_LOG_NAME=$LOG_PATH/php_$(date +"%d-%m-%Y")
 export CRON_LOG_NAME=$LOG_PATH/cron_$(date +"%d-%m-%Y")
 CROND_PATH=$CRON_LOG_NAME
 
+# echo $USERNAME_int $USERGROUP
+
+# internal username
+USERNAME_int=$(whoami)
+
 cd $LOG_PATH
 touch $CRON_LOG_NAME
 touch $PHP_LOG_NAME
-# chown $(whoami):users $LOG_PATH -R
 
-cd ${SRV_PATH} 
+cd $SRV_PATH 
 
-# composer update
-# composer install
+# if [ -d ./composer.lock ]; then
+#     rm composer.lock
+# fi
+
+if composer check | grep "missing"; then
+    echo "composer check failed:"
+    composer check | grep "missing"
+    # exit 1
+fi
 
 if [ -d ./vendor ]; then
     echo "deps is okay"
+    chown $USERNAME_int:$USERGROUP ./vendor -R
 else
+    composer update
     composer install
+    chown $USERNAME_int:$USERGROUP ./vendor -R
 fi
 
 # HTTP

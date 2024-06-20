@@ -1,8 +1,2 @@
 # sed regex to exclude unsuccessful message
-*       *       *       *       *       cd $CMD_PATH && php artisan schedule:run | sed -e '/No scheduled commands are ready to run\./d'
-#*       *       *       *       *       run-parts /etc/periodic/1min
-#*/15    *       *       *       *       run-parts /etc/periodic/15min
-#0       *       *       *       *       run-parts /etc/periodic/hourly
-#0       2       *       *       *       run-parts /etc/periodic/daily
-#0       3       *       *       6       run-parts /etc/periodic/weekly
-#0       5       1       *       *       run-parts /etc/periodic/monthly
+*       *       *       *       *       cd $CMD_PATH && php artisan schedule:run | sed -e '/No scheduled */d'
