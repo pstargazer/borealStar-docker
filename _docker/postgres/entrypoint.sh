@@ -19,7 +19,7 @@ function startdb {
 
 
 dumpdb() {
-    stopdb
+    # stopdb
     startdb
     # su postgres -c "pg_ctl start"
     # ARG 1 - middle dump name (onstart|onstop)
@@ -38,16 +38,21 @@ dumpdb() {
     cd $EXPORT_PATH
     # get the dump of database    
 
-    # pg_dumpall  \
+    # pg_dumpall --database borealstar \
 	# 	--no-acl --no-owner \
 	# 	--exclude-database="template*" \
+	# 	--exclude-schema="tiger*" \
+	# 	--clean --if-exists \
 	# 	 -U $POSTGRES_USER >> $EXPORT_PATH\/${sequenceId}_bs_dump_${middlename}_$(date +%d-%h-%Y-%H:%M:%S).sql
-    pg_dumpall --database borealstar \
-		--no-acl --no-owner \
-		--exclude-database="template*" \
-		--exclude-schema="tiger*" \
-		--clean --if-exists \
-		 -U $POSTGRES_USER >> $EXPORT_PATH\/${sequenceId}_bs_dump_${middlename}_$(date +%d-%h-%Y-%H:%M:%S).sql
+
+    pg_dump \
+            --file=$EXPORT_PATH\/${sequenceId}_bs_dump_${middlename}_$(date +%d-%h-%Y-%H:%M:%S).sql \
+            --schema=public \
+            --no-owner \
+            --create \
+            --username $POSTGRES_USER \
+            borealstar
+
     chown 1000:users $EXPORT_PATH
     echo "DUMPDB: database dump complete"
     stopdb

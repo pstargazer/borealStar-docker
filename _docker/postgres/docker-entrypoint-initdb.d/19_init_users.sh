@@ -7,7 +7,7 @@ function add_user {
     local dbname=$3
 
     psql \
-    -v ON_ERROR_STOP=0 \
+    -v ON_ERROR_STOP=1 \
     -U $POSTGRES_USER \
     -d $dbname  <<-EOSQL 
     CREATE DATABASE $table;
