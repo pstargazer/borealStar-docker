@@ -81,6 +81,11 @@ services:
     volumes:
       - backend_storage:/app/storage/
       - ./backend/:/app/
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1.5G
 
   frontend:
     container_name: "bs_frontend"
