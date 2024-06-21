@@ -50,12 +50,12 @@ dumpdb() {
     pg_dump \
             --file=$FILENAME \
             --schema=public \
-            --no-owner \
             --create \
             --username $POSTGRES_USER \
             borealstar 
     # rewrite the CREATE SCHEMA with IF EXISTS
     # and exclude CREATE DATABASE due crashes
+    # REMEMBER TO SET $POSTGRES_DB
     cat $FILENAME | awk '/CREATE SCHEMA / { sub(/CREATE SCHEMA /, "CREATE SCHEMA IF NOT EXISTS "); } 1'  | awk '! /^CREATE DATABASE/' > $FILENAME_ed
 
     chown 1000:users $EXPORT_PATH
