@@ -49,42 +49,42 @@ RUN docker-php-source extract
 
 # somewhy extentions fails when installed together,so installing one-by-one
 
-RUN docker-php-ext-configure    zip 
-RUN docker-php-ext-configure    phar
-RUN docker-php-ext-configure    pcntl
-RUN docker-php-ext-configure    pdo
-RUN docker-php-ext-configure    pgsql
-RUN docker-php-ext-configure    pdo_pgsql
-RUN docker-php-ext-configure    session
-RUN docker-php-ext-configure    dom
-RUN docker-php-ext-configure    fileinfo 
-RUN docker-php-ext-configure    xml 
-RUN docker-php-ext-configure    xmlwriter
+RUN docker-php-ext-configure    zip \
+    && docker-php-ext-configure    phar \
+    && docker-php-ext-configure    pcntl \
+    && docker-php-ext-configure    pdo \
+    && docker-php-ext-configure    pgsql \
+    && docker-php-ext-configure    pdo_pgsql \
+    && docker-php-ext-configure    session \
+    && docker-php-ext-configure    dom \
+    && docker-php-ext-configure    fileinfo  \
+    && docker-php-ext-configure    xml  \
+    && docker-php-ext-configure    xmlwriter
 
 
-RUN docker-php-ext-install      zip
-RUN docker-php-ext-install      phar
-RUN docker-php-ext-install      pcntl
-RUN docker-php-ext-install      pdo
-RUN docker-php-ext-install      pgsql
-RUN docker-php-ext-install      pdo_pgsql
-RUN docker-php-ext-install      session
-RUN docker-php-ext-install      dom
-RUN docker-php-ext-install      fileinfo 
-RUN docker-php-ext-install      xml 
-RUN docker-php-ext-install      xmlwriter
+RUN docker-php-ext-install      zip \
+ && docker-php-ext-install      phar  \
+ && docker-php-ext-install      pcntl  \
+ && docker-php-ext-install      pdo  \
+ && docker-php-ext-install      pgsql  \
+ && docker-php-ext-install      pdo_pgsql  \
+ && docker-php-ext-install      session  \
+ && docker-php-ext-install      dom  \
+ && docker-php-ext-install      fileinfo   \
+ && docker-php-ext-install      xml   \
+ && docker-php-ext-install      xmlwriter 
 
-RUN docker-php-ext-enable       zip
-RUN docker-php-ext-enable       phar
-RUN docker-php-ext-enable       pcntl
-RUN docker-php-ext-enable       pdo 
-RUN docker-php-ext-enable       pgsql
-RUN docker-php-ext-enable       pdo_pgsql
-RUN docker-php-ext-enable       session
-RUN docker-php-ext-enable       dom
-RUN docker-php-ext-enable       fileinfo
-RUN docker-php-ext-enable       xml
-RUN docker-php-ext-enable       xmlwriter
+RUN docker-php-ext-enable       zip \
+ && docker-php-ext-enable       phar \
+ && docker-php-ext-enable       pcntl \
+ && docker-php-ext-enable       pdo  \
+ && docker-php-ext-enable       pgsql \
+ && docker-php-ext-enable       pdo_pgsql \
+ && docker-php-ext-enable       session \
+ && docker-php-ext-enable       dom \
+ && docker-php-ext-enable       fileinfo \
+ && docker-php-ext-enable       xml \
+ && docker-php-ext-enable       xmlwriter
 
 # seems like already exists
 # RUN docker-php-ext-configure    tokenizer
