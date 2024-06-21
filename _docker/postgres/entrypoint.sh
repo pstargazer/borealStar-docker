@@ -51,7 +51,9 @@ dumpdb() {
             --file=$FILENAME \
             --schema=public \
             --create \
-            --username $POSTGRES_USER \
+            --no-owner \
+            --superuser=$PROCESS_USER \
+            --username=$POSTGRES_USER \
             borealstar 
     # rewrite the CREATE SCHEMA with IF EXISTS
     # and exclude CREATE DATABASE due crashes
