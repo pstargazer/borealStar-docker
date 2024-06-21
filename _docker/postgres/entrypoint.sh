@@ -44,14 +44,19 @@ dumpdb() {
 	# 	--exclude-schema="tiger*" \
 	# 	--clean --if-exists \
 	# 	 -U $POSTGRES_USER >> $EXPORT_PATH\/${sequenceId}_bs_dump_${middlename}_$(date +%d-%h-%Y-%H:%M:%S).sql
+    FILENAME=$EXPORT_PATH\/${sequenceId}_bs_dump_${middlename}_$(date +%d-%h-%Y-%H:%M:%S).sql
+    FILENAME_ed=$EXPORT_PATH\/${sequenceId}_bs_dump_${middlename}_$(date +%d-%h-%Y-%H:%M:%S)_ed.sql
 
     pg_dump \
-            --file=$EXPORT_PATH\/${sequenceId}_bs_dump_${middlename}_$(date +%d-%h-%Y-%H:%M:%S).sql \
+            --file=$FILENAME \
             --schema=public \
             --no-owner \
             --create \
             --username $POSTGRES_USER \
-            borealstar
+            borealstar 
+    # rewrite the CREATE SCHEMA with IF EXISTS
+    # and exclude CREATE DATABASE due crashes
+    cat $FILENAME | awk '/CREATE SCHEMA / { sub(/CREATE SCHEMA /, "CREATE SCHEMA IF NOT EXISTS "); } 1'  | awk '! /^CREATE DATABASE/' > $FILENAME_ed
 
     chown 1000:users $EXPORT_PATH
     echo "DUMPDB: database dump complete"
