@@ -1,4 +1,4 @@
-# version: '3.9'
+version: '3.9'
 # version: "3.3"
 
 
@@ -85,7 +85,7 @@ services:
       resources:
         limits:
           cpus: '2'
-          memory: 1.5G
+          memory: 2G
 
   frontend:
     container_name: "bs_frontend"
