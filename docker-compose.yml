@@ -108,6 +108,7 @@ services:
       - 8000
     ports:
     - 81:5173
+    - 80:5173
   
 
   # future production backend 
