@@ -37,8 +37,9 @@ else
     chown $USERNAME_int:$USERGROUP ./vendor -R
 fi
 
+
 # HTTP
-cd ${SRV_PATH} && php artisan serve & 
+cd ${SRV_PATH} && php artisan route:cache && php artisan serve & 
 # WS
 php artisan reverb:start --debug &
 php artisan queue:listen &
