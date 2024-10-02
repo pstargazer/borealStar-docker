@@ -1,6 +1,8 @@
 
-.PHONY: b_run clean run init
+.PHONY: perms b_run clean run init
 
+perms: 
+	sudo chmod u+x -R . && chown 1000:1000 -R .
 
 b_run:
 	docker-compose build
