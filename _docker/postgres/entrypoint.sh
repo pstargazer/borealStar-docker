@@ -47,13 +47,14 @@ dumpdb() {
     FILENAME=$EXPORT_PATH\/${sequenceId}_bs_dump_${middlename}_$(date +%d-%h-%Y-%H:%M:%S).sql
     FILENAME_ed=$EXPORT_PATH\/${sequenceId}_bs_dump_${middlename}_$(date +%d-%h-%Y-%H:%M:%S)_ed.sql
 
+            # --username=$POSTGRES_USER \
     pg_dump \
             --file=$FILENAME \
             --schema=public \
             --create \
             --no-owner \
             --superuser=$PROCESS_USER \
-            --username=$POSTGRES_USER \
+            --username=postgres \
             borealstar 
     # rewrite the CREATE SCHEMA with IF EXISTS
     # and exclude CREATE DATABASE due crashes
@@ -65,9 +66,6 @@ dumpdb() {
     stopdb
 }
 
-# perform standart init
-# /usr/local/bin/docker-entrypoint.sh
-/usr/local/bin/docker-ensure-initdb.sh
 # setup handlers
 echo "setting stop handler"
 trap "dumpdb \"onstop\"" HUP INT QUIT TERM USR1 KILL
@@ -81,6 +79,9 @@ dumpdb "onstart"
 dpid=$!
 # wait for script to halt
 # and backup the db dump 
-su "postgres" -c "postgres" & wait $dpid
+
+# postgres & wait $dpid
+su postgres --command "postgres" & wait $dpid
 
 
+# https://stackoverflow.com/questions/11919391/postgresql-error-fatal-role-username-does-not-exist

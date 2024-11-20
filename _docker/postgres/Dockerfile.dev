@@ -1,14 +1,16 @@
 FROM postgis/postgis:16-3.4
 
 # COPY ./entrypoint.sh /opt/
-COPY ./pgconf/ /tmp/pgconf/
+COPY ./master-pgconf/ /tmp/pgconf/
 
 # install ps command
 RUN apt-get update && apt-get install procps -y
 
 
-COPY ./entrypoint.sh /tmp/
-COPY ./docker-entrypoint-initdb.d /docker-entrypoint-initdb.d/
+# COPY ./entrypoint.sh /tmp/
+COPY ./master-initdb.d /docker-entrypoint-initdb.d/
+COPY ./master-pgconf/ /etc/postgres/conf/
 EXPOSE 5432
 
-ENTRYPOINT [ "/tmp/entrypoint.sh" ]
+# custom conf dir set as pgdata to specify needed configs
+CMD ["postgres", "-D", "/etc/postgres/conf/"]

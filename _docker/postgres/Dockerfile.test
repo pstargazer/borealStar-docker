@@ -1,0 +1,16 @@
+# FROM postgres:16.4-bookworm
+FROM postgis/postgis:16-3.4
+
+
+# COPY ./entrypoint.sh /opt/
+
+# install ps command
+RUN apt-get update && apt-get install procps -y
+
+COPY ./slave-initdb.d /docker-entrypoint-initdb.d/
+COPY --chmod=777 ./slave-entrypoint.sh /usr/bin/
+COPY ./slave-pgconf/ /etc/postgres/conf/
+EXPOSE 5432
+
+# CMD ["postgres"]
+ENTRYPOINT "/usr/bin/slave-entrypoint.sh"

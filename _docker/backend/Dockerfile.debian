@@ -69,7 +69,6 @@ RUN docker-php-ext-install pdo_pgsql
 
 
 COPY _docker/backend/entrypoint.sh /tmp/
-RUN chmod 777 /tmp/entrypoint.sh
 
 RUN composer install
 

@@ -2,7 +2,6 @@ dump/**
 log/**
 disabled/*
 
-docker-entrypoint-initdb.d/20-bs-dump.sql
+# docker-entrypoint-initdb.d/*.sql
+*.sql
 *dump*
-
-# cat /etc/postgresql-common/createcluster.conf 

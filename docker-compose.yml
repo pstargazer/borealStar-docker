@@ -1,156 +1,176 @@
-version: '3.9'
-# version: "3.3"
+x-postgres_common: 
+    &postgres_common
+    healthcheck:
+        # test: ["CMD-SHELL", "pg_isready --quiet"]
+        test: ['CMD-SHELL', 'pg_isready -U postgres']
+        # test: ["CMD-SHELL", "pg_isready -U postgres || exit 1"]
+        start_period: 120s
+        interval: 30s
+        timeout: 60s
+        retries: 20
+    profiles:
+    - local
+    - prod
+    - nofront
+    networks:
+        bsnet0:
+    expose:
+    - 5432
 
 
 volumes:
-  pgdata:
-    driver: local
-  backend_storage:
-    driver: local 
-
+    pgdata_master:
+        driver: local
+    pgdata_slave:
+        driver: local
+    backend_storage:
+        driver: local 
 
 networks:
-  bsnet0:
-    driver: bridge
-    # ipam:
-      # driver: default
-      # config:
-      # - subnet: 172.16.0.0/16
-        # ip_range: 172.16.5.0/24 
-        # gateway: 172.16.255.255
-        # gateway: 172.16.0.4
-
+    bsnet0:
+        driver: bridge
 
 services:
-  # database development
-  database:
-    build: 
-      context: _docker/postgres/
-      dockerfile: Dockerfile.dev
-    container_name: "bs_db"
-    volumes:
-      - pgdata:/var/lib/postgresql/
-      - ./_docker/postgres/dumps:/opt/dumps/:rw
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready --quiet"]
-      interval: 10s
-      timeout: 40s
-      retries: 5
+  # development DB
+    postgres_master: 
+        <<: *postgres_common
+        build: 
+            dockerfile: Dockerfile.dev
+            context: _docker/postgres/
+        container_name: "bs_db_master"
+        volumes:
+            - ./_docker/postgres/dumps:/opt/dumps/:rw
+            - pgdata_master:/var/lib/postgresql/
+        env_file:
+            - ./_docker/postgres/.env.postgres 
 
-    env_file:
-      - ./_docker/postgres/.env.postgres 
+    # testing DB
+    postgres_slave:
+        <<: *postgres_common
+        build: 
+            dockerfile: Dockerfile.test
+            context: _docker/postgres/
+        container_name: "bs_db_slave"
+        env_file:
+            - ./_docker/postgres/.env.postgres 
+        depends_on:
+            postgres_master:
+                condition: service_healthy  
+        volumes:
+            - pgdata_slave:/var/lib/postgresql/
 
-    profiles:
-    - local
-    - prod
-    - nofront
+    # backend development
+    backend:
+        container_name: "bs_backend"
+        build: 
+            context: .
+            dockerfile: _docker/backend/Dockerfile.alpine
 
-    networks:
-      bsnet0:
-    expose:
-      - 5432
+        expose:
+            - 8000
+            - 443
+            - 85
+        profiles:
+        - local
+        - nofront
+            
+        ports:
+            - 85:85
 
-  # backend development
-  backend:
-    container_name: "bs_backend"
-    build: 
-      context: .
-      dockerfile: _docker/backend/Dockerfile.alpine
+        depends_on:
+            postgres_master:
+                condition: service_healthy
+            postgres_slave:
+                condition: service_healthy
+            
+        environment:
+            - CMD_PATH=/app/
 
-    expose:
-      - 8000
-      - 443
-      - 85
-    profiles:
-    - local
-    - nofront
-      
-    ports:
-     - 85:85
+        networks:
+            bsnet0:
 
-    depends_on:
-      database:
-        condition: service_healthy
-      
-    environment:
-      - CMD_PATH=/app/
+        volumes:
+            - backend_storage:/app/storage/
+            - ./backend/:/app/
+        deploy:
+            resources:
+                limits:
+                    cpus: '1'
+                    memory: 1G
 
-    networks:
-      bsnet0:
-
-    volumes:
-      - backend_storage:/app/storage/
-      - ./backend/:/app/
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 1G
-
-  frontend:
-    container_name: "bs_frontend"
-    volumes:
-      - ./frontend/:/app/:rw
-    build: 
-      context: .
-      dockerfile: _docker/frontend/Dockerfile
+    frontend:
+        container_name: "bs_frontend"
+        volumes:
+            - ./frontend/:/app/:rw
+        build: 
+            context: .
+            dockerfile: _docker/frontend/Dockerfile
 
 
-    profiles:
-    - local
-    - prod
+        profiles:
+        - local
+        - prod
 
-    networks:
-      bsnet0:
-        # ipv4_address: 172.16.0.4
-    expose:
-      - 5173
-      - 8000
-    ports:
-    - 81:5173
-    - 80:5173
-  
+        networks:
+            bsnet0:
+            # ipv4_address: 172.16.0.4
+        expose:
+            - 5173
+            - 8000
+        ports:
+        - 81:5173
+        - 80:5173
 
-  # future production backend 
-  backend_prod:
-    container_name: bs_backend_prod
-    build: 
-      context: .
-      dockerfile: _docker/backend/Dockerfile.alpine.prod
-    expose:
-      - 8000
-      - 443
-    ports:
-    - 85:85
-    networks:
-      bsnet0:
-        # ipv4_address: 172.16.0.2
 
-    profiles:
-    - prod
-      
-    depends_on:
-      database:
-        condition: service_healthy
-      
-    environment:
-      - CMD_PATH=/app/
-    volumes:
-      - backend_storage:/app/storage/
-      - ./backend/:/app/
+        # future production backend 
+    backend_prod:
+        container_name: bs_backend_prod
+        build: 
+            context: .
+            dockerfile: _docker/backend/Dockerfile.alpine.prod
+        expose:
+            - 8000
+            - 443
+        ports:
+        - 85:85
+        networks:
+            bsnet0:
+            # ipv4_address: 172.16.0.2
 
-  # db adminer
-  adminer:
-    container_name: "bs_adminer"
-    image: adminer
-    restart: always
-    ports:
-      - 8080:8080
-    depends_on:
-      database:
-        condition: service_healthy
-    networks:
-      - bsnet0
-    profiles:
-    - local
+        profiles:
+        - prod
+            
+        depends_on:
+            postgres_master:
+                condition: service_healthy
+            
+        environment:
+            - CMD_PATH=/app/
+        volumes:
+            - backend_storage:/app/storage/
+            - ./backend/:/app/
+
+        # db adminer
+    # adminer:
+    #     container_name: "bs_adminer"
+    #     image: adminer
+    #     restart: always
+    #     ports:
+    #         - 8080:8080
+    #     depends_on:
+    #         postgres_master:
+    #             condition: "service_healthy"
+    #     networks:
+    #         - bsnet0
+    #     profiles:
+    #     - local
+    pgadmin:
+        image: elestio/pgadmin:latest
+        restart: always
+        env_file: .env.adminer
+        ports:
+        - "8080:8080"
+        # - "172.17.0.1:8080:8080"
+        # volumes:
+        # - ./servers.json:/pgadmin4/servers.json
 

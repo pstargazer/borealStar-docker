@@ -28,6 +28,7 @@ function add_user {
 
 }
 
+add_user root $PROCESS_PASSWORD root
 add_user $PROCESS_USER $PROCESS_PASSWORD $POSTGRES_DB
-add_user root $PROCESS_PASSWORD $POSTGRES_DB
+# add_user root $PROCESS_PASSWORD $POSTGRES_DB
 # add_user admin $PROCESS_PASSWORD $POSTGRES_DB

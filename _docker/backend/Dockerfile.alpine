@@ -129,8 +129,8 @@ ADD ./_docker/backend/conf/periodic-etc/ /etc/periodic/
 # RUN setcap cap_setgid+ep /usr/sbin/crond
 # log directory
 RUN mkdir /var/log/server
-RUN chmod -R 777 /var/log
-RUN chown ${USERNAME}:${USERGROUP} /var/log/server -R
+# RUN chmod -R 777 /var/log
+# RUN chown ${USERNAME}:${USERGROUP} /var/log/server -R
 
 
 # copy conf files in etc root
@@ -144,8 +144,8 @@ ADD --chown=${USERNAME}:${USERGROUP} --chmod=775 ./backend/ .
 COPY ./_docker/backend/conf/nginx/ /etc/nginx/
 
 
-RUN su -c "chmod -R 777 ${CMD_PATH}"
-RUN su -c "chown -R 2000:users ${CMD_PATH}/*"
+# RUN su -c "chmod -R 777 ${CMD_PATH}"
+# RUN su -c "chown -R 2000:users ${CMD_PATH}/*"
 
 ADD --chown=${USERNAME}:users --chmod=775 _docker/backend/entrypoint.sh ${ENTRY_PREFIX}/
 
